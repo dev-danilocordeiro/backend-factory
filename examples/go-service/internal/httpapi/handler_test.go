@@ -1,8 +1,10 @@
 package httpapi_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -41,6 +43,55 @@ func TestGetUnknownIs404(t *testing.T) {
 
 func TestMalformedJSONIs400(t *testing.T) {
 	if rec := do(newServer(), http.MethodPost, "/orders", `{`); rec.Code != http.StatusBadRequest {
+		t.Fatalf("got %d", rec.Code)
+	}
+}
+
+func setVersion(t *testing.T, v string) {
+	t.Helper()
+	old := httpapi.Version
+	httpapi.Version = v
+	t.Cleanup(func() { httpapi.Version = old })
+}
+
+func checkHealthz(t *testing.T, rec *httptest.ResponseRecorder, version string) {
+	t.Helper()
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status: got %d", rec.Code)
+	}
+	if ct := rec.Header().Get("Content-Type"); ct != "application/json" {
+		t.Fatalf("content type: got %q", ct)
+	}
+	var got map[string]any
+	if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+		t.Fatalf("decode: %v (%s)", err, rec.Body)
+	}
+	want := map[string]any{"status": "ok", "version": version}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("body: got %v, want %v", got, want)
+	}
+}
+
+func TestHealthzDefaultVersion(t *testing.T) {
+	checkHealthz(t, do(newServer(), http.MethodGet, "/healthz", ""), "dev")
+}
+
+func TestHealthzEmptyVersionIsDev(t *testing.T) {
+	setVersion(t, "")
+	checkHealthz(t, do(newServer(), http.MethodGet, "/healthz", ""), "dev")
+}
+
+func TestHealthzBuildVersion(t *testing.T) {
+	setVersion(t, "1.2.3")
+	checkHealthz(t, do(newServer(), http.MethodGet, "/healthz", ""), "1.2.3")
+}
+
+func TestHealthzDoesNotUseOrderService(t *testing.T) {
+	checkHealthz(t, do(httpapi.NewHandler(nil), http.MethodGet, "/healthz", ""), "dev")
+}
+
+func TestHealthzPostIs405(t *testing.T) {
+	if rec := do(newServer(), http.MethodPost, "/healthz", ""); rec.Code != http.StatusMethodNotAllowed {
 		t.Fatalf("got %d", rec.Code)
 	}
 }

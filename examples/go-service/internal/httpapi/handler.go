@@ -51,7 +51,15 @@ func NewHandler(svc *order.Service) http.Handler {
 		}
 		writeJSON(w, http.StatusOK, out)
 	})
+	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(w, http.StatusOK, healthResponse{Status: "ok", Version: currentVersion()})
+	})
 	return mux
+}
+
+type healthResponse struct {
+	Status  string `json:"status"`
+	Version string `json:"version"`
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {
