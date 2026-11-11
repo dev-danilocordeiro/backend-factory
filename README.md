@@ -96,6 +96,7 @@ Five issues were opened on this repository and each was run once with `factory r
 | Stopped for a human | 2 (spec: 1, gates: 1) |
 | Pipeline errors | 0 |
 | Turns / cost, counted runs | 206 / $4.20 |
+| Repository CI on the opened PRs | 3 of 3 green. The first CI runs failed because of a workflow bug (tool install needed Go ≥ 1.26), not because of the PRs. After the fix (a1514c8) I closed and reopened the PRs to re-run CI. PR #9 also needed a branch update from `main` (a merge commit I made, not the pipeline) before it picked up the fixed workflow. |
 
 Issue #1 ran twice. The first run opened PR [#6](https://github.com/dev-danilocordeiro/backend-factory/pull/6) (38 turns, $0.98). I closed it because its body and `gates.json` contained absolute paths from my machine. After the fix (e68cdca) I re-ran the issue. The table counts the second run; the raw log has both. With the discarded run included, the totals are 244 turns and $5.17.
 
