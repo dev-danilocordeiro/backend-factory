@@ -37,7 +37,6 @@ type Config struct {
 	MaxDiffLines    int    // changed lines outside .factory/ allowed in one PR
 	Model           string
 	Limits          map[state.Stage]Limits
-	GateTimeout     time.Duration
 	NeedsHumanLabel string
 	Remote          bool // push branches, open PRs, comment on issues
 }
