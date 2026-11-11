@@ -1,0 +1,50 @@
+{
+  "issue": "1",
+  "source": "github",
+  "title": "Add GET /healthz with the build version",
+  "service": "examples/go-service",
+  "base": "main",
+  "branch": "factory/1-add-get-healthz-with-the-build-version",
+  "stage": "pr",
+  "attempt": 1,
+  "status": "pr_opened",
+  "cost_usd": 0.7981434000000001,
+  "history": [
+    {
+      "time": "2026-11-11T01:37:20.32657977Z",
+      "stage": "spec",
+      "attempt": 0,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:37:53.643972351Z",
+      "stage": "plan",
+      "attempt": 0,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:38:29.85767203Z",
+      "stage": "implement",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:39:12.906045089Z",
+      "stage": "test",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:39:14.815913889Z",
+      "stage": "gates",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:39:40.915114308Z",
+      "stage": "review",
+      "attempt": 1,
+      "ok": true
+    }
+  ]
+}
