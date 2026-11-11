@@ -57,6 +57,11 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.5.2</version>
           <configuration>
+            <includes>
+              <include>**/*Test.java</include>
+              <include>**/*IT.java</include>
+            </includes>
+            <!-- Docker and real-model tests are opt-in: -Pdocker, -Pe2e -->
             <excludedGroups>docker,e2e</excludedGroups>
           </configuration>
         </plugin>
