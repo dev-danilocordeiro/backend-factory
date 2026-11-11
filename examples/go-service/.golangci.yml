@@ -1,0 +1,33 @@
+version: "2"
+linters:
+  enable:
+    - depguard
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - revive
+  settings:
+    depguard:
+      rules:
+        # Architecture rule: HTTP handlers talk to the order service, never to storage.
+        httpapi-not-store:
+          files:
+            - "**/internal/httpapi/*.go"
+            - "!$test"
+          deny:
+            - pkg: example.com/go-service/internal/store
+              desc: "httpapi must depend on order.Service, not on storage"
+        # Architecture rule: the domain does not know about transport or storage.
+        order-is-inner:
+          files:
+            - "**/internal/order/*.go"
+            - "!$test"
+          deny:
+            - pkg: example.com/go-service/internal/httpapi
+              desc: "the order domain must not depend on HTTP"
+            - pkg: example.com/go-service/internal/store
+              desc: "the order domain must not depend on a storage implementation"
+            - pkg: net/http
+              desc: "the order domain must not depend on HTTP"
