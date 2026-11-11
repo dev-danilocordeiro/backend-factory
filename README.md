@@ -4,6 +4,11 @@ Takes an issue to a pull request with Claude Code in headless mode. It is opinio
 
 Each stage runs as a separate headless Claude Code session with its own subagent definition and the smallest tool set that stage needs. A small Go orchestrator decides what runs next. Deterministic gates (build, lint, architecture rules, tests) decide whether the change can leave. The model's opinion never does. The pipeline opens a pull request and stops there: it never merges and never writes to a protected branch.
 
+## Modules
+
+- `cmd/`, `internal/`: the Go orchestrator described below.
+- [`sandbox-runner/`](sandbox-runner/README.md): a Java 21 library (Maven, multi-module) that runs command-line agents in isolated Docker sandboxes, one branch each, and merges the commits back, with gates and an optional HTTP reviewer. It has a CLI that emits JSON events, and an optional Spring Boot starter. The orchestrator does not use it yet: today the stages run on the host (see Limits, "No sandbox").
+
 ## Flow
 
 ```
