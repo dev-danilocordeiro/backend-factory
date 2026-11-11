@@ -26,4 +26,20 @@ class OrderServiceTest {
         assertThrows(InvalidOrderException.class, () -> service.create(new Order(null, "c1", "A", 0, 1)));
         assertThrows(InvalidOrderException.class, () -> service.create(new Order(null, "c1", "A", 1, -1)));
     }
+
+    @Test
+    void totalCentsForIgnoresOtherCustomers() {
+        service.create(new Order(null, "c1", "A", 2, 100));
+        service.create(new Order(null, "c1", "B", 3, 50));
+        service.create(new Order(null, "c2", "A", 1, 999));
+        assertEquals(350, service.totalCentsFor("c1"));
+        assertEquals(999, service.totalCentsFor("c2"));
+    }
+
+    @Test
+    void totalCentsForUnknownCustomerIsZero() {
+        assertEquals(0, service.totalCentsFor("c9"));
+        service.create(new Order(null, "c1", "A", 2, 100));
+        assertEquals(0, service.totalCentsFor("c9"));
+    }
 }
