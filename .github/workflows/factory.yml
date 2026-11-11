@@ -44,7 +44,8 @@ jobs:
       - uses: actions/setup-go@v7
         if: steps.creds.outputs.skip != 'true'
         with:
-          go-version-file: go.mod
+          # go.mod states the minimum; golangci-lint v2.14 itself needs Go >= 1.26.
+          go-version: stable
       - uses: actions/setup-java@v6
         if: steps.creds.outputs.skip != 'true'
         with:

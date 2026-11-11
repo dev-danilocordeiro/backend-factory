@@ -1,5 +1,6 @@
 // Package httpapi exposes the order service over HTTP. It depends on the
 // order package only; it must not reach into storage (see .golangci.yml).
+// It also serves GET /healthz, which reports the build Version.
 package httpapi
 
 import (
@@ -53,6 +54,9 @@ func NewHandler(svc *order.Service) http.Handler {
 			out = []order.Order{}
 		}
 		writeJSON(w, http.StatusOK, out)
+	})
+	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(w, http.StatusOK, map[string]string{"status": "ok", "version": Version})
 	})
 	return mux
 }
