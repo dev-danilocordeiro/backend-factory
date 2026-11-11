@@ -1,0 +1,50 @@
+{
+  "issue": "4",
+  "source": "github",
+  "title": "Show the customer total on the orders screen",
+  "service": "examples/java-service",
+  "base": "main",
+  "branch": "factory/4-show-the-customer-total-on-the-orders-sc",
+  "stage": "pr",
+  "attempt": 1,
+  "status": "pr_opened",
+  "cost_usd": 1.3522184,
+  "history": [
+    {
+      "time": "2026-11-11T01:47:06.487722404Z",
+      "stage": "spec",
+      "attempt": 0,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:47:59.717345618Z",
+      "stage": "plan",
+      "attempt": 0,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:49:40.160031402Z",
+      "stage": "implement",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:50:18.788706736Z",
+      "stage": "test",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:50:26.04444822Z",
+      "stage": "gates",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:50:52.435576756Z",
+      "stage": "review",
+      "attempt": 1,
+      "ok": true
+    }
+  ]
+}
