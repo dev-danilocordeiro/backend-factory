@@ -255,7 +255,8 @@ public final class SandboxRunner {
                 gr = new GateResult(gr.name(), gr.ok(), gr.exitCode(), gr.timedOut(), redactor.redact(tail(gr.output())), gr.durationMs());
                 gateResults.add(gr);
                 emit(new RunEvent.GateFinished(runId, Instant.now(), gr.name(), gr.ok(), gr.durationMs()));
-                if (timedOut.get()) {
+                if (timedOut.get() || gr.timedOut()) {
+                    timedOut.set(true);
                     throw new SandboxDiedException("time limit reached during gate " + gr.name());
                 }
                 if (!gr.ok()) {
