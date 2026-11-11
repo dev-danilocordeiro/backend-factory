@@ -40,3 +40,6 @@
 {"time":"2026-11-11T01:50:58.056690801Z","kind":"issue_received","issue":"5","reason":"Make the order service faster"}
 {"time":"2026-11-11T01:51:12.050921174Z","kind":"stage_finished","issue":"5","stage":"spec","ok":true,"turns":6,"cost_usd":0.0733008,"duration_ms":13072}
 {"time":"2026-11-11T01:51:12.051021504Z","kind":"stopped_needs_human","issue":"5","stage":"spec","reason":"spec agent marked the issue NEEDS_HUMAN (or gave no READY marker)"}
+{"time":"2026-11-11T02:48:02.701312705Z","kind":"pr_merged","issue":"1","pr_url":"https://github.com/dev-danilocordeiro/backend-factory/pull/7"}
+{"time":"2026-11-11T02:48:03.101487899Z","kind":"pr_merged","issue":"2","pr_url":"https://github.com/dev-danilocordeiro/backend-factory/pull/8"}
+{"time":"2026-11-11T02:48:03.471024292Z","kind":"pr_merged","issue":"4","pr_url":"https://github.com/dev-danilocordeiro/backend-factory/pull/9"}
