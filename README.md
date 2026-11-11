@@ -97,7 +97,7 @@ Five issues were opened on this repository and each was run once with `factory r
 |---|---|
 | Issues received | 5 |
 | PRs opened | 3 |
-| PRs accepted (merged by a human) | 0 so far. No one has reviewed them yet. `factory metrics --refresh` updates this. |
+| PRs accepted (merged by a human) | 3 of 3. The maintainer merged them on 2026-11-11. Branch protection requires one approving review, and a PR author cannot approve their own PR, so the merges used the admin bypass: no independent review took place. PR #8 conflicted with #7 in `handler_test.go` because both added tests at the same spot. The maintainer resolved it by keeping both sets (commit bdcb2a6, all gates and CI green) before merging. |
 | Stopped for a human | 2 (spec: 1, gates: 1) |
 | Pipeline errors | 0 |
 | Turns / cost, counted runs | 206 / $4.20 |
