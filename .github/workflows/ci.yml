@@ -43,3 +43,15 @@ jobs:
           java-version: "21"
           cache: maven
       - run: for g in build lint arch test; do gates/java-maven.sh "$g" examples/java-service; done
+
+  # Java library; unit tests plus real-container integration tests (fake agent, no model).
+  sandbox-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - run: mvn -B -f sandbox-runner/pom.xml verify -Pdocker
