@@ -1,0 +1,83 @@
+# Runs backend-factory when the "factory" label is added to a GitHub issue,
+# or when `factory serve` forwards a Linear webhook as repository_dispatch.
+# Only users with triage access or more can add labels, which is the gate on
+# who can spend model budget.
+name: factory
+on:
+  issues:
+    types: [labeled]
+  repository_dispatch:
+    types: [factory-linear]
+
+concurrency:
+  group: factory-${{ github.event.issue.number || github.event.client_payload.issue.id }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    if: github.event_name == 'repository_dispatch' || github.event.label.name == 'factory'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write       # push factory/* branches (never main: refused in code)
+      pull-requests: write  # open PRs (there is no merge code path)
+      issues: write         # comment and add factory:needs-human
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      # PRs opened with the default GITHUB_TOKEN do not trigger other workflows (CI).
+      # Set FACTORY_GH_TOKEN (fine-grained PAT or app token) to get CI on factory PRs.
+      GH_TOKEN: ${{ secrets.FACTORY_GH_TOKEN || secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Require model credentials
+        id: creds
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "::notice::No ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN secret; skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v7
+        if: steps.creds.outputs.skip != 'true'
+        with:
+          fetch-depth: 0
+          token: ${{ env.GH_TOKEN }}
+      - uses: actions/setup-go@v7
+        if: steps.creds.outputs.skip != 'true'
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-java@v6
+        if: steps.creds.outputs.skip != 'true'
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Install tools
+        if: steps.creds.outputs.skip != 'true'
+        run: |
+          go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.14.0
+          npm install -g @anthropic-ai/claude-code@2.1.322
+          go build -o "$RUNNER_TEMP/factory" ./cmd/factory
+          git config user.name "backend-factory[bot]"
+          git config user.email "backend-factory@users.noreply.github.com"
+      - name: Run pipeline
+        if: steps.creds.outputs.skip != 'true'
+        env:
+          ISSUE: ${{ github.event.issue.number }}
+          LINEAR_ISSUE: ${{ toJSON(github.event.client_payload.issue) }}
+        run: |
+          set +e
+          if [ "$GITHUB_EVENT_NAME" = repository_dispatch ]; then
+            printf '%s' "$LINEAR_ISSUE" > "$RUNNER_TEMP/issue.json"
+            "$RUNNER_TEMP/factory" run --issue-file "$RUNNER_TEMP/issue.json" --work-root "$RUNNER_TEMP/work"
+          else
+            "$RUNNER_TEMP/factory" run --issue "$ISSUE" --work-root "$RUNNER_TEMP/work"
+          fi
+          code=$?
+          # 3 = stopped and handed to a human: the pipeline did its job.
+          [ "$code" -eq 0 ] || [ "$code" -eq 3 ]
+      - uses: actions/upload-artifact@v7
+        if: always() && steps.creds.outputs.skip != 'true'
+        with:
+          name: factory-metrics-${{ github.run_id }}
+          path: .factory/metrics.jsonl
+          if-no-files-found: ignore
