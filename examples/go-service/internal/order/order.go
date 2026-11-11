@@ -38,7 +38,7 @@ func NewService(repo Repository) *Service { return &Service{repo: repo} }
 
 // Create validates and stores a new order.
 func (s *Service) Create(ctx context.Context, o Order) (Order, error) {
-	if strings.TrimSpace(o.SKU) == "" || strings.TrimSpace(o.Customer) == "" {
+	if strings.TrimSpace(o.SKU) == "" || strings.TrimSpace(o.Customer) == "" || o.Quantity < 1 {
 		return Order{}, ErrInvalid
 	}
 	return s.repo.Save(ctx, o)

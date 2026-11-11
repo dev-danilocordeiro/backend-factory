@@ -1,0 +1,50 @@
+{
+  "issue": "2",
+  "source": "github",
+  "title": "POST /orders accepts zero or negative quantity",
+  "service": "examples/go-service",
+  "base": "main",
+  "branch": "factory/2-post-orders-accepts-zero-or-negative-qua",
+  "stage": "pr",
+  "attempt": 1,
+  "status": "pr_opened",
+  "cost_usd": 0.9238097999999999,
+  "history": [
+    {
+      "time": "2026-11-11T01:40:11.428693173Z",
+      "stage": "spec",
+      "attempt": 0,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:40:42.374189494Z",
+      "stage": "plan",
+      "attempt": 0,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:41:37.963730373Z",
+      "stage": "implement",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:42:06.682581342Z",
+      "stage": "test",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:42:07.932178422Z",
+      "stage": "gates",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:42:32.158165238Z",
+      "stage": "review",
+      "attempt": 1,
+      "ok": true
+    }
+  ]
+}

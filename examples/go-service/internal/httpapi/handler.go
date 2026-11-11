@@ -50,6 +50,9 @@ func NewHandler(svc *order.Service) http.Handler {
 			writeError(w, http.StatusInternalServerError, "internal error")
 			return
 		}
+		if out == nil {
+			out = []order.Order{}
+		}
 		writeJSON(w, http.StatusOK, out)
 	})
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, _ *http.Request) {
