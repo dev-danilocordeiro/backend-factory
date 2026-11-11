@@ -100,7 +100,7 @@ func cmdRun(ctx context.Context, args []string) error {
 	workRoot := fs.String("work-root", "", "parent dir for worktrees (default: user cache dir)")
 	claudeBin := fs.String("claude", "claude", "Claude Code binary")
 	budgetScale := fs.Float64("budget-scale", 1, "multiply every per-stage USD budget by this")
-	fs.Parse(args)
+	_ = fs.Parse(args) // ExitOnError: Parse exits on bad flags
 
 	if *repo == "" {
 		*repo = ghRepo(root)
@@ -184,7 +184,7 @@ func cmdMetrics(ctx context.Context, args []string) error {
 	path := fs.String("metrics", defaultMetrics(root), "metrics JSONL file")
 	refresh := fs.Bool("refresh", false, "ask GitHub which opened PRs were merged and record it")
 	asJSON := fs.Bool("json", false, "print JSON")
-	fs.Parse(args)
+	_ = fs.Parse(args) // ExitOnError: Parse exits on bad flags
 
 	evs, err := metrics.Read(*path)
 	if err != nil {
@@ -235,7 +235,7 @@ func cmdServe(ctx context.Context, args []string) error {
 	addr := fs.String("addr", ":8080", "listen address")
 	label := fs.String("label", "factory", "Linear label that triggers a run")
 	repo := fs.String("repo", os.Getenv("GITHUB_REPOSITORY"), "owner/name receiving repository_dispatch")
-	fs.Parse(args)
+	_ = fs.Parse(args) // ExitOnError: Parse exits on bad flags
 	secret := os.Getenv("LINEAR_WEBHOOK_SECRET")
 	if secret == "" || *repo == "" {
 		return errors.New("LINEAR_WEBHOOK_SECRET and --repo are required")
@@ -253,7 +253,7 @@ func cmdServe(ctx context.Context, args []string) error {
 	mux := http.NewServeMux()
 	mux.Handle("/linear", trigger.Handler(secret, *label, dispatch, time.Now))
 	srv := &http.Server{Addr: *addr, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
-	go func() { <-ctx.Done(); srv.Close() }()
+	go func() { <-ctx.Done(); _ = srv.Close() }()
 	log.Printf("listening on %s", *addr)
 	if err := srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		return err
