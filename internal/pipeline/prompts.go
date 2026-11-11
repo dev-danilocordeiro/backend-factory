@@ -65,8 +65,10 @@ func lastMatch(re *regexp.Regexp, text string) string {
 	return m[len(m)-1][1]
 }
 
-// section returns the body of a "## <name>" markdown section.
+// section returns the body of a "## <name>" markdown section, without the
+// STATUS/VERDICT marker lines that end agent documents.
 func section(md, name string) string {
+	md = verdictRe.ReplaceAllString(statusRe.ReplaceAllString(md, ""), "")
 	lines := strings.Split(md, "\n")
 	var out []string
 	in := false

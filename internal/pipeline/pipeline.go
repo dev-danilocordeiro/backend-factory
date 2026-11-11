@@ -189,7 +189,7 @@ func (p *Pipeline) attempt(ctx context.Context, r *run) (done, halt bool, err er
 		return fail(state.StageTest, r.lastNote)
 	}
 
-	rep, err := p.Gates.Run(ctx, filepath.Join(r.wt.Dir, p.Cfg.Service))
+	rep, err := p.Gates.Run(ctx, r.wt.Dir, p.Cfg.Service)
 	if err != nil {
 		return false, false, err
 	}
@@ -294,7 +294,11 @@ func (p *Pipeline) commit(ctx context.Context, r *run, what string) error {
 	if _, err := r.wt.StageAll(ctx); err != nil {
 		return err
 	}
-	_, err := r.wt.Commit(ctx, fmt.Sprintf("factory(%s): %s, attempt %d", r.issue.ID, what, r.st.Attempt))
+	msg := fmt.Sprintf("factory(%s): %s", r.issue.ID, what)
+	if r.st.Attempt > 0 {
+		msg += fmt.Sprintf(", attempt %d", r.st.Attempt)
+	}
+	_, err := r.wt.Commit(ctx, msg)
 	return err
 }
 
@@ -369,7 +373,14 @@ func (p *Pipeline) openPR(ctx context.Context, r *run) error {
 	return nil
 }
 
+// write saves an artifact. Artifacts are committed and may be public, so
+// local absolute paths are rewritten: worktree paths become repo-relative
+// and the home directory becomes "~".
 func (p *Pipeline) write(r *run, name, content string) error {
+	content = strings.ReplaceAll(content, r.wt.Dir+"/", "")
+	if home, err := os.UserHomeDir(); err == nil && home != "/" {
+		content = strings.ReplaceAll(content, home, "~")
+	}
 	return os.WriteFile(filepath.Join(r.artAbs, name), []byte(content), 0o644)
 }
 

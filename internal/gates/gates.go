@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -90,16 +91,18 @@ type Runner struct {
 	OutputTail int           // bytes of output kept for red gates
 }
 
-// Run detects the stack of serviceDir and runs every gate in Order.
-func (g Runner) Run(ctx context.Context, serviceDir string) (Report, error) {
-	stack, err := Detect(serviceDir)
+// Run detects the stack of service (relative to root) and runs every gate in
+// Order with root as the working directory. Reports use relative paths only,
+// so nothing about the machine that ran them ends up in a commit or a PR.
+func (g Runner) Run(ctx context.Context, root, service string) (Report, error) {
+	stack, err := Detect(filepath.Join(root, service))
 	if err != nil {
 		return Report{}, err
 	}
 	rep := Report{Stack: stack}
 	script := filepath.Join(g.ScriptsDir, string(stack)+".sh")
 	for i, gate := range Order {
-		res, err := g.runOne(ctx, script, gate, serviceDir)
+		res, err := g.runOne(ctx, script, gate, root, service)
 		if err != nil {
 			return rep, err
 		}
@@ -112,18 +115,20 @@ func (g Runner) Run(ctx context.Context, serviceDir string) (Report, error) {
 	return rep, nil
 }
 
-func (g Runner) runOne(ctx context.Context, script, gate, dir string) (Result, error) {
+func (g Runner) runOne(ctx context.Context, script, gate, root, service string) (Result, error) {
 	if g.Timeout > 0 {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, g.Timeout)
 		defer cancel()
 	}
 	start := time.Now()
-	cmd := exec.CommandContext(ctx, script, gate, dir)
+	cmd := exec.CommandContext(ctx, script, gate, service)
+	cmd.Dir = root
 	var out bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &out, &out
 	err := cmd.Run()
-	res := Result{Gate: gate, Command: fmt.Sprintf("%s %s %s", filepath.Base(script), gate, dir), DurationMS: time.Since(start).Milliseconds()}
+	res := Result{Gate: gate, Command: fmt.Sprintf("gates/%s %s %s", filepath.Base(script), gate, service),
+		DurationMS: time.Since(start).Milliseconds()}
 	var exitErr *exec.ExitError
 	switch {
 	case err == nil:
@@ -141,7 +146,7 @@ func (g Runner) runOne(ctx context.Context, script, gate, dir string) (Result, e
 		if n <= 0 {
 			n = 6000
 		}
-		s := out.String()
+		s := strings.ReplaceAll(out.String(), strings.TrimSuffix(root, "/")+"/", "")
 		if len(s) > n {
 			s = "…" + s[len(s)-n:]
 		}

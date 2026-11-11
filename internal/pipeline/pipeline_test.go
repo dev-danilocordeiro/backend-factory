@@ -234,3 +234,22 @@ func TestOversizedDiffHaltsWithoutRetry(t *testing.T) {
 		t.Fatalf("state %+v calls %v", st, m.calls)
 	}
 }
+
+func TestSectionDropsMarkers(t *testing.T) {
+	md := "## Risks\n\n- one\n\nVERDICT: APPROVE\n"
+	if got := section(md, "Risks"); got != "- one" {
+		t.Fatalf("got %q", got)
+	}
+}
+
+func TestPRBodyHasNoAbsolutePaths(t *testing.T) {
+	p, _ := setup(t, happyModel(), "exit 0")
+	if _, err := p.Run(context.Background(), vcs.Issue{ID: "9", Source: "github", Title: "x"}); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"pr.md", "gates.json"} {
+		if body := artifact(t, p, "9", name); strings.Contains(body, p.Cfg.WorkRoot) || strings.Contains(body, p.Cfg.RepoDir) {
+			t.Fatalf("%s leaks a local path:\n%s", name, body)
+		}
+	}
+}

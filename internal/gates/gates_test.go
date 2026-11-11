@@ -24,13 +24,14 @@ func TestDetect(t *testing.T) {
 }
 
 func TestRunStopsAtFirstRed(t *testing.T) {
-	scripts, svc := t.TempDir(), t.TempDir()
-	os.WriteFile(filepath.Join(svc, "go.mod"), []byte("module x\n"), 0o644)
-	// lint fails; arch and test must be skipped.
-	script := "#!/bin/sh\nif [ \"$1\" = lint ]; then echo 'lint broke'; exit 3; fi\nexit 0\n"
+	scripts, root := t.TempDir(), t.TempDir()
+	os.MkdirAll(filepath.Join(root, "svc"), 0o755)
+	os.WriteFile(filepath.Join(root, "svc", "go.mod"), []byte("module x\n"), 0o644)
+	// lint fails, printing an absolute path; arch and test must be skipped.
+	script := "#!/bin/sh\nif [ \"$1\" = lint ]; then echo \"lint broke in $PWD/$2/a.go\"; exit 3; fi\nexit 0\n"
 	os.WriteFile(filepath.Join(scripts, "go.sh"), []byte(script), 0o755)
 
-	rep, err := Runner{ScriptsDir: scripts}.Run(context.Background(), svc)
+	rep, err := Runner{ScriptsDir: scripts}.Run(context.Background(), root, "svc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +39,7 @@ func TestRunStopsAtFirstRed(t *testing.T) {
 		t.Fatal("must be red")
 	}
 	red := rep.FirstRed()
-	if red == nil || red.Gate != "lint" || red.ExitCode != 3 || red.Output != "lint broke\n" {
+	if red == nil || red.Gate != "lint" || red.ExitCode != 3 || red.Output != "lint broke in svc/a.go\n" {
 		t.Fatalf("bad red gate: %+v", red)
 	}
 	if !slices.Equal(rep.Skipped, []string{"arch", "test"}) {
@@ -47,11 +48,11 @@ func TestRunStopsAtFirstRed(t *testing.T) {
 }
 
 func TestRunGreen(t *testing.T) {
-	scripts, svc := t.TempDir(), t.TempDir()
-	os.WriteFile(filepath.Join(svc, "pom.xml"), nil, 0o644)
+	scripts, root := t.TempDir(), t.TempDir()
+	os.WriteFile(filepath.Join(root, "pom.xml"), nil, 0o644)
 	os.WriteFile(filepath.Join(scripts, "java-maven.sh"), []byte("#!/bin/sh\nexit 0\n"), 0o755)
-	rep, err := Runner{ScriptsDir: scripts}.Run(context.Background(), svc)
-	if err != nil || !rep.Green() || len(rep.Results) != len(Order) {
+	rep, err := Runner{ScriptsDir: scripts}.Run(context.Background(), root, ".")
+	if err != nil || !rep.Green() || len(rep.Results) != len(Order) || rep.Results[0].Command != "gates/java-maven.sh build ." {
 		t.Fatalf("%+v %v", rep, err)
 	}
 }
