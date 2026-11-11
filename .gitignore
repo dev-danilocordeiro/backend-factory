@@ -1,0 +1,5 @@
+/bin/
+/.factory/metrics.jsonl
+/.factory-work/
+*.tmp
+target/
