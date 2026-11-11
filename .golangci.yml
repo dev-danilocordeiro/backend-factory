@@ -1,0 +1,13 @@
+version: "2"
+linters:
+  exclusions:
+    rules:
+      # Test setup helpers fail loudly through later assertions.
+      - path: _test\.go
+        linters: [errcheck]
+  settings:
+    errcheck:
+      exclude-functions:
+        # Writing a response body to a client that went away is not actionable.
+        - fmt.Fprintf
+        - fmt.Fprintln
