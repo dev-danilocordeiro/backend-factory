@@ -70,6 +70,64 @@ class AppTest {
     }
 
     @Test
+    void otherCustomersNotCountedOverHttp() throws IOException, InterruptedException {
+        assertEquals(201, post("/orders", ORDER_A).statusCode());
+        assertEquals(201, post("/orders",
+                "{\"customerId\":\"c2\",\"sku\":\"A\",\"quantity\":1,\"unitPriceCents\":999}").statusCode());
+        HttpResponse<String> resp = get("/customers/c1/total");
+        assertEquals(200, resp.statusCode());
+        assertEquals("{\"customerId\":\"c1\",\"totalCents\":200}", resp.body());
+    }
+
+    @Test
+    void unknownCustomerIsZeroOverHttp() throws IOException, InterruptedException {
+        HttpResponse<String> empty = get("/customers/c9/total");
+        assertEquals(200, empty.statusCode());
+        assertEquals("{\"customerId\":\"c9\",\"totalCents\":0}", empty.body());
+        assertEquals(201, post("/orders", ORDER_A).statusCode());
+        HttpResponse<String> others = get("/customers/c9/total");
+        assertEquals(200, others.statusCode());
+        assertEquals("{\"customerId\":\"c9\",\"totalCents\":0}", others.body());
+    }
+
+    @Test
+    void totalIsJsonIntegerOverHttp() throws IOException, InterruptedException {
+        assertEquals(201, post("/orders",
+                "{\"customerId\":\"c1\",\"sku\":\"A\",\"quantity\":1,\"unitPriceCents\":12345}").statusCode());
+        HttpResponse<String> resp = get("/customers/c1/total");
+        assertEquals(200, resp.statusCode());
+        assertEquals("{\"customerId\":\"c1\",\"totalCents\":12345}", resp.body());
+    }
+
+    @Test
+    void postToTotalIsNoRouteOverHttp() throws IOException, InterruptedException {
+        HttpResponse<String> resp = post("/customers/c1/total", "{}");
+        assertEquals(404, resp.statusCode());
+        assertEquals("application/json", resp.headers().firstValue("Content-Type").orElse(""));
+        assertEquals("{\"error\":\"no route\"}", resp.body());
+    }
+
+    @Test
+    void otherCustomerPathsAreNoRouteOverHttp() throws IOException, InterruptedException {
+        for (String path : new String[] {"/customers/c1", "/customers"}) {
+            HttpResponse<String> resp = get(path);
+            assertEquals(404, resp.statusCode(), path);
+            assertEquals("{\"error\":\"no route\"}", resp.body(), path);
+        }
+    }
+
+    @Test
+    void getOrderByIdStillServed() throws IOException, InterruptedException {
+        HttpResponse<String> created = post("/orders", ORDER_A);
+        assertEquals(201, created.statusCode());
+        assertTrue(created.body().contains("\"id\":\"ord-1\""), created.body());
+        HttpResponse<String> one = get("/orders/ord-1");
+        assertEquals(200, one.statusCode());
+        assertEquals(created.body(), one.body());
+        assertEquals(404, get("/orders/nope").statusCode());
+    }
+
+    @Test
     void ordersRoutesStillServed() throws IOException, InterruptedException {
         assertEquals(201, post("/orders", ORDER_A).statusCode());
         HttpResponse<String> list = get("/orders");
