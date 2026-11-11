@@ -62,7 +62,7 @@ class BranchStrategyTest {
     }
 
     SandboxInstance sandbox(Workspace ws) {
-        return LocalProvider.unsafeForTestsOnly().create(new SandboxSpec("t", "none", ws.mounts(), ws.workdir(),
+        return LocalProvider.unsafeForTestsOnly().create(new SandboxSpec("t", ws.mounts(), ws.workdir(),
                 Map.of(), List.of(), NetworkPolicy.unrestricted(), Limits.defaults()));
     }
 
