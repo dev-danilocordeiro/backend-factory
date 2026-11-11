@@ -1,0 +1,33 @@
+{
+  "stack": "go",
+  "results": [
+    {
+      "gate": "build",
+      "command": "gates/go.sh build examples/go-service",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 357
+    },
+    {
+      "gate": "lint",
+      "command": "gates/go.sh lint examples/go-service",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 756
+    },
+    {
+      "gate": "arch",
+      "command": "gates/go.sh arch examples/go-service",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 150
+    },
+    {
+      "gate": "test",
+      "command": "gates/go.sh test examples/go-service",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 630
+    }
+  ]
+}
