@@ -1,0 +1,22 @@
+{
+  "issue": "5",
+  "source": "github",
+  "title": "Make the order service faster",
+  "service": "examples/java-service",
+  "base": "main",
+  "branch": "factory/5-make-the-order-service-faster",
+  "stage": "spec",
+  "attempt": 0,
+  "status": "needs_human",
+  "failed_stage": "spec",
+  "reason": "spec agent marked the issue NEEDS_HUMAN (or gave no READY marker)",
+  "cost_usd": 0.0733008,
+  "history": [
+    {
+      "time": "2026-11-11T01:51:12.050920074Z",
+      "stage": "spec",
+      "attempt": 0,
+      "ok": true
+    }
+  ]
+}
