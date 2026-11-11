@@ -13,6 +13,7 @@
   <modules>
     <module>sandbox-runner-core</module>
     <module>sandbox-runner-cli</module>
+    <module>sandbox-runner-spring-boot-starter</module>
   </modules>
 
   <properties>
