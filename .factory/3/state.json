@@ -1,0 +1,46 @@
+{
+  "issue": "3",
+  "source": "github",
+  "title": "Paginate GET /orders",
+  "service": "examples/java-service",
+  "base": "main",
+  "branch": "factory/3-paginate-get-orders",
+  "stage": "gates",
+  "attempt": 1,
+  "status": "needs_human",
+  "failed_stage": "gates",
+  "reason": "diff has 407 changed lines, cap is 400; split the issue",
+  "cost_usd": 1.0517342,
+  "history": [
+    {
+      "time": "2026-11-11T01:43:05.985495897Z",
+      "stage": "spec",
+      "attempt": 0,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:44:04.751500171Z",
+      "stage": "plan",
+      "attempt": 0,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:45:42.403053271Z",
+      "stage": "implement",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:46:28.74425367Z",
+      "stage": "test",
+      "attempt": 1,
+      "ok": true
+    },
+    {
+      "time": "2026-11-11T01:46:36.294421229Z",
+      "stage": "gates",
+      "attempt": 1,
+      "ok": true
+    }
+  ]
+}
